@@ -100,13 +100,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         stripeCustomerId
       });
       
-      // Create initial user limits for free plan
+      // Create initial user limits for free plan using centralized configuration
       await storage.createUserLimits({
         userId: user.id,
-        booksRemaining: 1,
-        pagesRemaining: 10,
-        imageCredits: 0
+        booksRemaining: PLAN_LIMITS.FREE.booksRemaining,
+        pagesRemaining: PLAN_LIMITS.FREE.pagesRemaining,
+        imageCredits: PLAN_LIMITS.FREE.imageCredits
       });
+      
+      console.log(`Created new user ${user.id} with free plan limits:`, PLAN_LIMITS.FREE);
       
       // Set user in session
       if (req.session) {

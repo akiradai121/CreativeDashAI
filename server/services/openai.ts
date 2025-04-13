@@ -1,12 +1,29 @@
 import OpenAI from "openai";
 
+// Check if OpenAI API key is available
+const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY;
+
+// Function to get OpenAI client
+const getOpenAIClient = () => {
+  if (!apiKey) {
+    console.warn("OPENAI_API_KEY is not set. OpenAI functionality will be limited.");
+    return null;
+  }
+  return new OpenAI({
+    apiKey
+  });
+};
+
 // Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPEN_API_KEY || "your-openai-api-key",
-});
+const openai = getOpenAIClient();
 
 // Get completion from OpenAI
 export async function getOpenAICompletion(prompt: string): Promise<string> {
+  if (!openai) {
+    console.warn("OpenAI client not initialized - returning mock completion");
+    return "This is a placeholder text since no OpenAI API key was provided. Please provide a valid API key to generate real content.";
+  }
+  
   try {
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
     // do not change this unless explicitly requested by the user
@@ -31,6 +48,11 @@ export async function getOpenAICompletion(prompt: string): Promise<string> {
 
 // Generate an image using DALL-E
 export async function generateDallEImage(prompt: string): Promise<string> {
+  if (!openai) {
+    console.warn("OpenAI client not initialized - returning placeholder image URL");
+    return "https://placehold.co/600x400?text=API+Key+Required";
+  }
+  
   try {
     const response = await openai.images.generate({
       model: "dall-e-3",
