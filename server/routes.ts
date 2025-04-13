@@ -17,7 +17,9 @@ import {
 import { 
   createStripeCustomer,
   createCheckoutSession, 
-  handleStripeWebhook 
+  handleStripeWebhook,
+  STRIPE_PRODUCTS,
+  PLAN_LIMITS
 } from "./services/stripe";
 import passport from "passport";
 import session from "express-session";
@@ -27,7 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 const MemoryStoreSession = MemoryStore(session);
 
 // User session data type
-interface UserSession {
+export interface UserSession {
   id: number;
   username: string;
   email: string;
@@ -193,28 +195,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add total limits based on plan
       let limitsWithTotal;
       switch (user.plan) {
-        case "creator":
+        case STRIPE_PRODUCTS.CREATOR:
           limitsWithTotal = {
             ...userLimits,
-            booksTotal: 5,
-            pagesTotal: 200,
-            imageCreditsTotal: 10
+            booksTotal: PLAN_LIMITS.CREATOR.booksRemaining,
+            pagesTotal: PLAN_LIMITS.CREATOR.pagesRemaining,
+            imageCreditsTotal: PLAN_LIMITS.CREATOR.imageCredits
           };
           break;
-        case "pro":
+        case STRIPE_PRODUCTS.PRO:
           limitsWithTotal = {
             ...userLimits,
-            booksTotal: 999, // Effectively unlimited
-            pagesTotal: 1000,
-            imageCreditsTotal: 50
+            booksTotal: PLAN_LIMITS.PRO.booksRemaining,
+            pagesTotal: PLAN_LIMITS.PRO.pagesRemaining,
+            imageCreditsTotal: PLAN_LIMITS.PRO.imageCredits
           };
           break;
         default: // Free plan
           limitsWithTotal = {
             ...userLimits,
-            booksTotal: 1,
-            pagesTotal: 10,
-            imageCreditsTotal: 0
+            booksTotal: PLAN_LIMITS.FREE.booksRemaining,
+            pagesTotal: PLAN_LIMITS.FREE.pagesRemaining,
+            imageCreditsTotal: PLAN_LIMITS.FREE.imageCredits
           };
       }
       
@@ -489,27 +491,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userLimits = await storage.getUserLimits(user.id);
       
       if (userLimits) {
+        let maxBooks;
+        
+        // Get max books allowed for the user's plan
         switch (user.plan) {
-          case "creator":
-            if (userLimits.booksRemaining < 5) {
-              await storage.updateUserLimits(user.id, {
-                booksRemaining: userLimits.booksRemaining + 1
-              });
-            }
+          case STRIPE_PRODUCTS.CREATOR:
+            maxBooks = PLAN_LIMITS.CREATOR.booksRemaining;
             break;
-          case "pro":
-            if (userLimits.booksRemaining < 999) {
-              await storage.updateUserLimits(user.id, {
-                booksRemaining: userLimits.booksRemaining + 1
-              });
-            }
+          case STRIPE_PRODUCTS.PRO:
+            maxBooks = PLAN_LIMITS.PRO.booksRemaining;
             break;
           default: // Free plan
-            if (userLimits.booksRemaining < 1) {
-              await storage.updateUserLimits(user.id, {
-                booksRemaining: userLimits.booksRemaining + 1
-              });
-            }
+            maxBooks = PLAN_LIMITS.FREE.booksRemaining;
+        }
+        
+        // Only increment if below the max limit
+        if (userLimits.booksRemaining < maxBooks) {
+          await storage.updateUserLimits(user.id, {
+            booksRemaining: userLimits.booksRemaining + 1
+          });
+          
+          console.log(`Refunded book credit to user ${user.id}, now has ${userLimits.booksRemaining + 1} remaining`);
         }
       }
       
@@ -577,37 +579,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (user) {
             let plan = "free";
-            let booksRemaining = 1;
-            let pagesRemaining = 10;
-            let imageCredits = 0;
             
             if (session.metadata && session.metadata.plan) {
               plan = session.metadata.plan;
-              
-              // Set limits based on plan
-              switch (plan) {
-                case "creator":
-                  booksRemaining = 5;
-                  pagesRemaining = 200;
-                  imageCredits = 10;
-                  break;
-                case "pro":
-                  booksRemaining = 999; // Effectively unlimited
-                  pagesRemaining = 1000;
-                  imageCredits = 50;
-                  break;
+            }
+            
+            // Update user plan
+            await storage.updateUser(user.id, { plan });
+            
+            // Get plan limits from centralized configuration
+            let limitsConfig = PLAN_LIMITS.FREE;
+            if (plan === STRIPE_PRODUCTS.CREATOR) {
+              limitsConfig = PLAN_LIMITS.CREATOR;
+            } else if (plan === STRIPE_PRODUCTS.PRO) {
+              limitsConfig = PLAN_LIMITS.PRO;
+            }
+            
+            // Update user limits
+            await storage.updateUserLimits(user.id, {
+              booksRemaining: limitsConfig.booksRemaining,
+              pagesRemaining: limitsConfig.pagesRemaining,
+              imageCredits: limitsConfig.imageCredits
+            });
+            
+            console.log(`Updated user ${user.id} to plan: ${plan} with limits:`, limitsConfig);
+          } else {
+            console.error("No user found for Stripe customer ID:", session.customer);
+          }
+          
+          break;
+        }
+        case "customer.subscription.updated": {
+          const subscription = event.data.object;
+          
+          // Handle subscription updates (plan changes)
+          const user = await storage.getUserByStripeCustomerId(subscription.customer as string);
+          
+          if (user) {
+            // Get plan from subscription metadata or item
+            const productId = subscription.items?.data[0]?.price?.product as string;
+            let plan = "free";
+            
+            if (productId) {
+              if (productId.includes("creator")) {
+                plan = STRIPE_PRODUCTS.CREATOR;
+              } else if (productId.includes("pro")) {
+                plan = STRIPE_PRODUCTS.PRO;
               }
             }
             
             // Update user plan
             await storage.updateUser(user.id, { plan });
             
+            // Get plan limits from centralized configuration
+            let limitsConfig = PLAN_LIMITS.FREE;
+            if (plan === STRIPE_PRODUCTS.CREATOR) {
+              limitsConfig = PLAN_LIMITS.CREATOR;
+            } else if (plan === STRIPE_PRODUCTS.PRO) {
+              limitsConfig = PLAN_LIMITS.PRO;
+            }
+            
             // Update user limits
             await storage.updateUserLimits(user.id, {
-              booksRemaining,
-              pagesRemaining,
-              imageCredits
+              booksRemaining: limitsConfig.booksRemaining,
+              pagesRemaining: limitsConfig.pagesRemaining,
+              imageCredits: limitsConfig.imageCredits
             });
+            
+            console.log(`Updated user ${user.id} subscription to plan: ${plan}`);
+          } else {
+            console.error("No user found for Stripe customer ID:", subscription.customer);
           }
           
           break;
@@ -620,21 +661,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (user) {
             // Update user plan
-            await storage.updateUser(user.id, { plan: "free" });
+            await storage.updateUser(user.id, { plan: STRIPE_PRODUCTS.FREE });
             
             // Update user limits to free tier
-            await storage.updateUserLimits(user.id, {
-              booksRemaining: 1,
-              pagesRemaining: 10,
-              imageCredits: 0
-            });
+            await storage.updateUserLimits(user.id, PLAN_LIMITS.FREE);
+            
+            console.log(`Downgraded user ${user.id} to free plan`);
+          } else {
+            console.error("No user found for Stripe customer ID:", subscription.customer);
           }
           
           break;
         }
       }
       
-      res.json({ received: true });
+      res.json({ received: true, success: true });
     } catch (error) {
       console.error("Webhook error:", error);
       res.status(400).send(`Webhook Error: ${error}`);
