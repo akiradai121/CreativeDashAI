@@ -29,8 +29,8 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/pricing">
-                <a className="text-gray-600 hover:text-gray-900 font-medium">Pricing</a>
+              <Link href="/pricing" className="text-gray-600 hover:text-gray-900 font-medium">
+                Pricing
               </Link>
               <Link href="/auth">
                 <Button variant="outline">Login</Button>
@@ -60,7 +60,7 @@ export default function LandingPage() {
                 fully structured, export-ready books with custom formatting and optional AI-generated images.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Link href="/dashboard">
+                <Link href="/auth">
                   <Button size="lg" className="rounded-full px-8">
                     Start Creating <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -209,7 +209,7 @@ export default function LandingPage() {
                   <span className="text-sm text-gray-600">Basic editing</span>
                 </div>
               </div>
-              <Link href="/dashboard" className="mt-auto">
+              <Link href="/auth" className="mt-auto">
                 <Button variant="outline" className="w-full">Get started</Button>
               </Link>
             </div>
@@ -297,7 +297,7 @@ export default function LandingPage() {
               Join thousands of authors creating beautiful books with Prompt2Book.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link href="/dashboard">
+              <Link href="/auth">
                 <Button size="lg" className="rounded-full px-8">
                   Get Started for Free
                 </Button>
