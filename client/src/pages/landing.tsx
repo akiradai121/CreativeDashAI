@@ -9,7 +9,8 @@ import {
   ImagePlus,
   Braces,
   Clock,
-  Check
+  Check,
+  CheckCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -22,9 +23,9 @@ export default function LandingPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <BookText className="h-8 w-8 text-primary" />
+                <BookText className="h-8 w-8 text-purple-600" />
                 <span className="ml-2 text-xl font-bold text-gray-900 font-poppins">
-                  Prompt<span className="text-primary">2Book</span>
+                  Prompt<span className="text-purple-600">2Book</span>
                 </span>
               </div>
             </div>
@@ -33,10 +34,10 @@ export default function LandingPage() {
                 Pricing
               </Link>
               <Link href="/auth">
-                <Button variant="outline">Login</Button>
+                <Button variant="outline" className="font-medium">Sign In</Button>
               </Link>
               <Link href="/auth">
-                <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <Button className="bg-purple-600 hover:bg-purple-700 font-medium">Sign Up</Button>
               </Link>
             </div>
           </div>
@@ -44,54 +45,64 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 sm:pt-32 sm:pb-20">
+      <section className="pt-28 pb-16 sm:pt-36 sm:pb-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="md:flex items-center md:space-x-16 lg:space-x-24">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="md:w-1/2 text-center md:text-left mb-12 md:mb-0"
             >
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl font-poppins">
-                Turn your prompts into beautifully formatted books
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl font-poppins leading-tight">
+                Turn a <span className="text-purple-600">Prompt</span> into a <span className="text-purple-600">Full Book</span> Instantly
               </h1>
-              <p className="mt-6 text-lg leading-8 text-gray-600">
-                Prompt2Book is an AI-powered platform that transforms your simple text prompts into
-                fully structured, export-ready books with custom formatting and optional AI-generated images.
+              <p className="mt-6 text-lg leading-8 text-gray-600 max-w-md mx-auto md:mx-0">
+                Our AI-powered platform transforms your ideas into beautifully crafted books complete with chapters, content, and stunning visuals.
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
+              <div className="mt-10 flex items-center justify-center md:justify-start gap-x-4">
                 <Link href="/auth">
-                  <Button size="lg" className="rounded-full px-8">
-                    Start Creating <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button size="lg" className="rounded-lg px-8 py-6 text-base bg-purple-600 hover:bg-purple-700">
+                    Create Your Book
                   </Button>
                 </Link>
                 <Link href="/pricing">
-                  <Button variant="ghost" size="lg">
-                    View pricing
+                  <Button variant="outline" size="lg" className="rounded-lg py-6 text-base">
+                    Learn More
                   </Button>
                 </Link>
               </div>
             </motion.div>
+
+            {/* Hero Image */}
+            <motion.div 
+              className="md:w-1/2"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+            >
+              <div className="rounded-xl bg-white shadow-2xl p-6 relative">
+                <div className="absolute -top-4 -right-4 bg-purple-100 rounded-lg p-3">
+                  <Sparkles className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="h-64 bg-purple-100 rounded-lg mb-4 flex items-center justify-center">
+                  <BookText className="h-16 w-16 text-purple-600" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-100 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-100 rounded w-full"></div>
+                  <div className="h-3 bg-gray-100 rounded w-5/6"></div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <div className="bg-purple-600 text-white rounded-lg py-2 px-4 text-sm flex items-center">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
-
-        {/* Hero Image */}
-        <motion.div 
-          className="mt-16 flow-root sm:mt-24"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-        >
-          <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-            <div className="rounded-lg shadow-2xl ring-1 ring-gray-900/10">
-              <img
-                src="https://cdn.dribbble.com/userupload/4799686/file/original-72f2a08e2b60f3c5df14fe3e5c8324d9.png?compress=1&resize=1600x1200"
-                alt="Book creation interface"
-                className="w-full rounded-lg"
-              />
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* Features Section */}

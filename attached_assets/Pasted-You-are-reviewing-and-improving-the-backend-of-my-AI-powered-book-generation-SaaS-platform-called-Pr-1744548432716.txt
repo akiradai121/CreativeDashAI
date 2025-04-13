@@ -1,0 +1,103 @@
+You are reviewing and improving the backend of my AI-powered book generation SaaS platform called Prompt2Book.
+It manages user accounts, AI-generated books, file storage, and payment subscriptions through Stripe. The frontend is being built separately with React and Tailwind on Replit.
+
+Please carefully:
+
+🔍 1️⃣ Debug the Current Backend Code
+Check for API endpoint errors, typos, bad requests, missing error handling, or unhandled promise rejections.
+
+Confirm that book generation, image generation, book preview, edit, download, and delete endpoints are cleanly built and functioning.
+
+Review and debug all database calls: check table/collection names, field references, insert/update/query logic, and ensure proper error handling is in place.
+
+Validate JWT or session-based auth — confirm tokens are securely verified and user sessions are properly gated.
+
+Ensure file uploads and downloads are secure, with private storage, expiring download links, and correct MIME type handling for PDFs and images.
+
+Inspect for console errors, CORS issues, and ensure all environment variables are properly scoped and not exposed to the client.
+
+Suggest performance improvements: API rate limiting, AI prompt input debouncing, lazy loading of images and books in the dashboard, caching AI-generated images if possible.
+
+💳 2️⃣ Integrate and Test Stripe Billing
+Add Stripe Checkout integration with 2 plans:
+
+Creator — $9.99/month
+
+Pro — $19.98/month
+
+Set up API endpoints for creating Stripe checkout sessions.
+
+On successful payment:
+
+Update the users table/collection with: active plan name, price, Stripe customer ID, subscription start/renewal dates.
+
+Ensure subscription details are reflected in the dashboard view.
+
+Implement and test Stripe webhook handlers for:
+
+checkout.session.completed
+
+customer.subscription.updated
+
+customer.subscription.deleted
+
+Return checkout session URLs to the frontend for redirect.
+
+Include proper error handling for failed payment intents or cancelled sessions.
+
+Test all payment and webhook flows in Stripe Test Mode.
+
+Suggest fallback logic if a payment webhook is delayed (to avoid locking users out).
+
+📑 3️⃣ Optimize Backend Structure and Logic
+Review route organization:
+Should be cleanly structured (e.g. /api/create-book, /api/download, /api/edit-book, /api/create-image, /api/payment/create-session, /api/payment/webhook).
+
+Ensure storage/file client is properly initialized and managed in all routes.
+
+Confirm environment variables and API keys are safely handled in .env files and not exposed to the frontend.
+
+Suggest improvements if the code can be better modularized (e.g. utility functions for PDF generation, image creation, database interactions).
+
+Check for duplicate code blocks and refactor where needed.
+
+📊 4️⃣ Validate Storage and Data Structure
+Review existing database tables/collections:
+
+users
+
+books
+
+images
+
+subscriptions (if applicable)
+
+Confirm primary keys, foreign keys (if relational), and data types make sense.
+
+Suggest improvements like adding created_at, updated_at, status, plan fields where useful.
+
+Review storage structure:
+
+Confirm organized folders for books, images, cover images, and user-specific storage paths (e.g. books/user-id/book-id.pdf).
+
+Ensure file permissions and URL expiration settings are correctly applied.
+
+📌 5️⃣ My Suggestions / Improvements Beyond What’s Asked:
+Add a retry mechanism for failed AI prompt generations or file uploads.
+
+Include a manual regenerate images button per book in the dashboard.
+
+Enable PDF viewer with in-page text editing and per-page AI rewriting using prompts (if not already implemented).
+
+Add option to select page ranges when generating a book.
+
+Integrate a grace period buffer before revoking access after a payment failure.
+
+Optimize AI image generation by batching prompts where possible.
+
+Future-proof by adding plan upgrade/downgrade support via Stripe’s Customer Portal.
+
+Suggest adding request logs or lightweight error monitoring with a tool like LogSnag, LogRocket, or Sentry.
+
+Implement CORS protection — allow requests only from approved frontend domains.
+
