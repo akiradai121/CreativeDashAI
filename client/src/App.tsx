@@ -9,6 +9,7 @@ import CreateBook from "@/pages/create-book";
 import EditBook from "@/pages/edit-book";
 import ViewBook from "@/pages/view-book";
 import Pricing from "@/pages/pricing";
+import AuthPage from "@/pages/auth-page";
 import { AuthProvider } from "./lib/auth-context";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/edit-book/:id" component={EditBook} />
       <Route path="/view-book/:id" component={ViewBook} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
   );

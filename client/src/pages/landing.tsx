@@ -32,10 +32,10 @@ export default function LandingPage() {
               <Link href="/pricing">
                 <a className="text-gray-600 hover:text-gray-900 font-medium">Pricing</a>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/auth">
                 <Button variant="outline">Login</Button>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/auth">
                 <Button>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
             </div>
