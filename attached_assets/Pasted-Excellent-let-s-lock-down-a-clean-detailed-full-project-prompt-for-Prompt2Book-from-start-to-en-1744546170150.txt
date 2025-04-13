@@ -1,0 +1,159 @@
+Excellent — let’s lock down a clean, detailed **full project prompt for Prompt2Book from start to end**. You can hand this over to Lovable, Cursor, Supabase, and Stripe setups in sequence, or keep it as your master scope doc. Here’s your polished, production-ready project prompt:
+
+---
+
+## 📖 Prompt2Book — Full Project Build Prompt (From Start to End)
+
+**Goal:**  
+Build a no-code/low-code AI SaaS platform called **Prompt2Book** where users can input a simple text prompt, and generate a fully structured, export-ready book (PDF, EPUB, DOCX) optionally with AI-generated images, adjustable page sizes (A4, A5, etc.), and full editing freedom before downloading.
+
+---
+
+## 🎨 Design (Lovable Prompt)
+
+**Style Guide:**
+- Clean, light modern UI
+- Fonts: Inter, Poppins
+- Colors: Soft blue, light purple accents
+- Rounded corners, subtle drop shadows
+- Smooth micro-animations for transitions
+
+**Screens to Design:**
+1. **Landing Page (before login)**
+   - Hero: Title, subtext, call-to-actions (Get Started, Pricing)
+   - Features section
+   - Pricing section
+   - Footer
+
+2. **Dashboard (after login)**
+   - Welcome message with user name
+   - Recent books grid
+   - Create New Book button
+   - Plan summary and Upgrade Plan button
+   - Usage stats: books created, pages remaining, image credits
+
+3. **Create Book Page**
+   - Prompt input
+   - Book format selection (PDF, EPUB, DOCX)
+   - Page size selection (A4, A5, Custom)
+   - Page range selection
+   - Image generation toggle
+   - Generate Book button
+
+4. **Download Page (after generation)**
+   - Book preview (PDF viewer styled to user’s format)
+   - Download buttons for PDF/EPUB
+   - Edit This Book button
+   - Regenerate Images button (if image option was selected)
+
+5. **Edit Book Page**
+   - Actual embedded PDF preview with page numbers
+   - Edit by selecting a page
+   - Edit text directly or use AI prompt to modify content
+   - AI Image generation for individual or all pages
+   - Save and recompile
+
+6. **Pricing Page**
+   - Free, Creator ($9.99/mo), Pro ($19.99/mo)
+   - List of limits for each plan (books per month, image credits, pages per book)
+   - Upgrade button linking to Stripe Checkout
+
+---
+
+## 🖥️ Backend (Cursor Prompt)
+
+**Stack:** Supabase + Stripe + AI API (OpenAI, DALL·E, or Stability)
+
+**Tasks:**
+- Integrate Supabase for:
+  - User authentication (sign up, login, logout)
+  - Storing book metadata, limits, plans
+  - Storing generated PDFs, images
+- Set up Stripe for payments:
+  - Plans: Free, Creator, Pro
+  - Payment via Stripe Checkout
+  - Webhooks for successful payment & subscription cancellation
+  - Plan management (book limits, image limits, etc.)
+- Implement APIs:
+  - `/api/signup`
+  - `/api/login`
+  - `/api/create-book`
+  - `/api/update-book`
+  - `/api/generate-image`
+  - `/api/save-pdf`
+  - `/api/get-books`
+  - `/api/get-book/:id`
+  - `/api/create-checkout-session`
+  - `/api/webhook`
+- AI Text & Image Generation (optional via OpenAI / DALL·E)
+
+**Usage Limits (based on plan):**
+- Free: 1 book, 10 pages, 0 image credits
+- Creator: 5 books, 200 pages, 10 images
+- Pro: Unlimited books, 1000 pages, 50 images
+
+---
+
+## 💳 Stripe Prompt
+
+**Tasks:**
+- Set up 3 products/plans in Stripe dashboard
+- Integrate Stripe Checkout in `/api/create-checkout-session`
+- Store Stripe customer ID in Supabase users table
+- Create webhook listener at `/api/webhook` for:
+  - `checkout.session.completed` → upgrade plan + limits
+  - `customer.subscription.deleted` → downgrade to Free
+- Sync subscription status with Supabase
+
+---
+
+## 📝 UX Text/Copy Deck (for buttons, tooltips, notifications)
+
+**Create Book Page:**
+- `Enter your book prompt here…`
+- `Select book format`
+- `Choose page size`
+- `Select page range (optional)`
+- `Include AI-generated images?`
+- `Generate Book`
+
+**Dashboard:**
+- `Welcome back, [UserName]!`
+- `Create New Book`
+- `Your Recent Books`
+- `Upgrade Plan`
+
+**Download Page:**
+- `Download as PDF`
+- `Download as EPUB`
+- `Edit This Book`
+- `Regenerate Images`
+- `Preview Book`
+
+**Notifications:**
+- `Book generated successfully!`
+- `Your plan has been upgraded.`
+- `You’ve reached your book/image limit.`
+
+---
+
+## ✅ Final Flow Summary:
+
+1. User visits landing page  
+2. Signs up/logs in  
+3. Lands on dashboard  
+4. Creates a new book (selects format, size, range, images optional)  
+5. Generates book via AI  
+6. Lands on download page (no preview in-between)  
+7. Can download, or click `Edit This Book`  
+8. Can edit specific pages, AI re-generate images, save and recompile  
+9. Access recent books and manage plan via dashboard  
+10. Pay with Stripe for plan upgrades  
+
+---
+
+That’s your **complete, structured project prompt from start to end.**
+
+---
+
+If you want, I can also draft a **project plan timeline + milestones breakdown** for this if you say **“Yes, project plan too”** 🚀
